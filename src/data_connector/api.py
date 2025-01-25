@@ -6,29 +6,10 @@ from flask_restx import Api, Namespace, Resource, fields
 from flask_restx.api import HTTPStatus
 from flask_restx.reqparse import FileStorage
 
+from .utils import allowed_file_extension, parse_file, parse_line
+
 from .record import Record
 from .show_ads_api_wrapper import send_data, send_record
-
-
-def parse_line(line: str) -> Record | None:
-    """Parse a single line from CSV file.
-
-    :param str line: A line from the file.
-
-    :return: Constructed Record object; None if failed.
-    :rtype: Record | None
-    """
-    data = line.strip().split(",")
-
-    # can throw an exception
-    try:
-        rec = Record(data[0], int(data[1]), data[2], int(data[3]))
-        log.debug(f"Record {rec.cookie} loaded.")
-        return rec
-    except (TypeError, ValueError):
-        log.warning(f"Error while parsing data: {data}")
-        return None
-
 
 # init API
 data_connector_api = Api(title="DataConnectorAPI", version="1.0.0")
@@ -94,6 +75,18 @@ class SendRecord(Resource):
 class SendBulk(Resource):
     @send_record_ns.doc(parser=file_parser)
     @send_record_ns.response(
+        code=HTTPStatus.BAD_REQUEST,
+        description="File is missing.",
+        model=fields.String,
+        envelope="message",
+    )
+    @send_record_ns.response(
+        code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
+        description="Received file is not supported.",
+        model=fields.String,
+        envelope="message",
+    )
+    @send_record_ns.response(
         code=HTTPStatus.ACCEPTED,
         description="Number of sent records.",
         model=fields.Integer,
@@ -103,10 +96,14 @@ class SendBulk(Resource):
         args = file_parser.parse_args()
         upload_file: FileStorage = args["file"]
         buffer: list[Record] = []
-        for line in upload_file:
-            rec = parse_line(line.decode())
-            if rec and rec.validate():
-                buffer.append(rec)
-
+        if not upload_file:
+            return {
+                "message": "CSV file required."
+            }, HTTPStatus.BAD_REQUEST
+        if not allowed_file_extension(upload_file.filename):
+            return {
+                "message": "Unsupported file format. Only CSV files are accepted."
+            }, HTTPStatus.UNSUPPORTED_MEDIA_TYPE
+        buffer = parse_file(upload_file, None, None)
         nof_recs = send_data(buffer)
         return {"sent": nof_recs}, HTTPStatus.ACCEPTED

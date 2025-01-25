@@ -1,17 +1,15 @@
+from __future__ import annotations
+
 import logging
+import os
 
-from flask import Flask
+from data_connector import create_app
 
-from .api import data_connector_api
-
-log = logging.getLogger("werkzeug")
-log.setLevel(logging.ERROR)
-
-
-def create_app() -> Flask:
-    app = Flask(__name__)
-    data_connector_api.init_app(app)
-    return app
-
+if not os.getenv("API_URL"):
+    logging.error("Environment variable API_URL not found.")
+    exit(1)
+if not os.getenv("PROJECT_KEY"):
+    logging.error("Environment variable PROJECT_KEY not found.")
+    exit(1)
 
 app = create_app()

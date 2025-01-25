@@ -7,10 +7,10 @@ import pytest
 import requests
 import requests_mock
 from flask import Flask
-from flask.testing import FlaskClient
+from flask.testing import FlaskClient, FlaskCliRunner
 
-from src.show_ads_api_wrapper import OPT_DICT
-from src.wsgi import create_app
+from data_connector.show_ads_api_wrapper import OPT_DICT
+from data_connector import create_app
 
 
 def single_rec_callback(
@@ -74,3 +74,8 @@ def app() -> Iterator[Flask]:
 @pytest.fixture
 def client(app: Flask) -> FlaskClient:
     return app.test_client()
+
+
+@pytest.fixture
+def cli(app: Flask) -> FlaskCliRunner:
+    return app.test_cli_runner()

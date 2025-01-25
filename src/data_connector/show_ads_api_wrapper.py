@@ -3,26 +3,32 @@ from __future__ import annotations
 import logging
 import os
 from typing import Any
-from uuid import uuid4
 
 import requests
 
-from .record import Record
+from data_connector.record import Record
+from data_connector.utils import store_unsent_records
 
 OPT_DICT: dict[str, Any] = {
     "base_url": os.getenv("API_URL"),
-    "project_key": os.getenv("PROJECT_KEY", str(uuid4())),
+    "project_key": os.getenv("PROJECT_KEY"),
     "access_token": "",
 }
 
 
 def send_data(buffer: list[Record]) -> int:
+    """Send a list of records to the ShowAds API.
+
+    :param list[Record] buffer: A list containing all the valid records.
+    :return: Number of records sent.
+    :rtype: int
+    """
     total_sent = 0
     i = 0
     while i <= len(buffer) // 1000:
         # send a bulk of max 1000 records
         total_sent += send_bulk(i, buffer[i * 1000 : min((i + 1) * 1000, len(buffer))])
-        i+=1
+        i += 1
     return total_sent
 
 
@@ -82,13 +88,21 @@ def send_bulk(bulk_id: int, lof_records: list[Record]) -> int:
             logging.debug(f"Send bulk {bulk_id}: A bulk successfully sent.")
             rec_sent = len(lof_records)
             retries = 0
-        if res.status_code == 401:
+        elif res.status_code == 401:
             update_access_token()
-        if res.status_code == 400:
+        elif res.status_code == 400:
             logging.error(f"Send bulk {bulk_id} fail: Bad request.")
-        if res.status_code == 500:
+        elif res.status_code == 500:
             logging.error(f"Send bulk {bulk_id} fail: Destination server error.")
+        else:
+            logging.error(f"Send bulk {bulk_id} fail: Return code {res.status_code}.")
         retries -= 1
+
+    # app was unable to forward data to ShowAds API
+    # thus we store it in CSV file (for convenience)
+    # and try it later
+    if rec_sent == 0:
+        store_unsent_records(lof_records)
     return rec_sent
 
 
@@ -117,14 +131,25 @@ def send_record(rec: Record) -> int:
         if res.status_code == 200:
             rec_sent = 1
             retries = 0
-        if res.status_code == 401:
+        elif res.status_code == 401:
             update_access_token()
-        if res.status_code == 400:
-            logging.error(f"Send record fail: Bad request.")
-        if res.status_code == 500:
-            logging.error(f"Send record fail: Destination server error.")
-        if res.status_code == 429:
-            logging.error(f"Send record fail: Destination server is under heavy load.")
+        elif res.status_code == 400:
+            logging.error(f"Send record {rec.cookie} fail: Bad request.")
+        elif res.status_code == 500:
+            logging.error(f"Send record {rec.cookie} fail: Destination server error.")
+        elif res.status_code == 429:
+            logging.error(
+                f"Send record {rec.cookie} fail: Destination server is under heavy load."
+            )
+        else:
+            logging.error(
+                f"Send record {rec.cookie} fail: Return code {res.status_code}."
+            )
 
         retries -= 1
+    # app was unable to forward data to ShowAds API
+    # thus we store it in CSV file (for convenience)
+    # and try it later
+    if rec_sent == 0:
+        store_unsent_records([rec])
     return rec_sent

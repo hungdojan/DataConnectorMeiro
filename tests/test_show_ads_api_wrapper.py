@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.record import Record
-from src.show_ads_api_wrapper import (
+from data_connector.record import Record
+from data_connector.show_ads_api_wrapper import (
     OPT_DICT,
     send_bulk,
     send_data,

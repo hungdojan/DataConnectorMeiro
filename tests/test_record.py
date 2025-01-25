@@ -1,6 +1,6 @@
 import logging
 
-from src.record import Record
+from data_connector.record import Record
 
 
 def test_validate_record(caplog):

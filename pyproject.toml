@@ -4,18 +4,23 @@ version = "0.1.0"
 description = "A PoC data connector for Meiro"
 authors = ["Hung Do <hungdojan@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "data-connector", from = "src" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 requests = "^2.32.3"
 flask = "^3.1.0"
 flask-restx = "^1.3.0"
+gunicorn = "^23.0.0"
 
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.4"
 pytest-env = "^1.1.5"
 requests-mock = "^1.12.1"
+coverage = "^7.6.10"
 
 [build-system]
 requires = ["poetry-core"]
@@ -26,5 +31,13 @@ env = [
     "API_URL=http://showadsapi.com",
     "PROJECT_KEY=project-key",
     "MIN_AGE=18",
+    "FAILED_RECORDS_DIRPATH=/tmp"
 ]
 addopts = "-vs"
+
+[tool.coverage.html]
+directory = "tests/reports/htmlcov"
+
+[tool.coverage.run]
+omit = ["tests/*", "/tmp/*"]
+command_line = "-m pytest -vv"
