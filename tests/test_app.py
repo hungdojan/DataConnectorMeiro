@@ -25,14 +25,49 @@ def test_send_record_api(client, mock_ok):
         assert res.status_code == HTTPStatus.ACCEPTED
         assert res.json["message"] == "Record id sent to ShowAPI."
 
+        res = client.post(
+            "/send_record",
+            json={
+                "name": "Mario",
+                "age": 10,
+                "cookie": "id",
+                "banner_id": 10,
+                "min_age": 20,
+            },
+        )
+        assert res.status_code == HTTPStatus.ACCEPTED
+        assert "did not pass" in res.json["message"]
+
 
 def test_send_bulk_api(client, mock_ok):
     filepath = Path(__file__).parent / "resources" / "test_data.csv"
-    data = {"file": (open(filepath, "rb"), filepath)}
     with mock_ok:
-        res = client.post("/send_record/bulk", data=data)
-        assert res.status_code == HTTPStatus.ACCEPTED
-        assert res.json["sent"] == 3
+        with open(filepath, "rb") as f:
+            res = client.post("/send_record/bulk", data={"file": (f, filepath)})
+            assert res.status_code == HTTPStatus.ACCEPTED
+            assert res.json["sent"] == 3
+
+        with open(filepath, "rb") as f:
+            res = client.post(
+                "/send_record/bulk", data={"file": (f, filepath), "max_age": 30}
+            )
+            assert res.status_code == HTTPStatus.ACCEPTED
+            assert res.json["sent"] == 2
+
+        with open(filepath, "rb") as f:
+            res = client.post(
+                "/send_record/bulk", data={"file": (f, filepath), "min_age": 30}
+            )
+            assert res.status_code == HTTPStatus.ACCEPTED
+            assert res.json["sent"] == 1
+
+        with open(filepath, "rb") as f:
+            res = client.post(
+                "/send_record/bulk",
+                data={"file": (f, filepath), "min_age": 27, "max_age": 30},
+            )
+            assert res.status_code == HTTPStatus.ACCEPTED
+            assert res.json["sent"] == 0
 
 
 def test_cli_upload_file(cli: FlaskCliRunner, mock_ok):
