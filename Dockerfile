@@ -5,7 +5,8 @@ WORKDIR /app
 COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENV MIN_AGE=18 \
+ENV FLASK_APP=/app/src/wsgi \
+    MIN_AGE=18 \
     FAILED_RECORDS_DIRPATH=/recover_dir \
     PYTHONPATH=/app/src
 
