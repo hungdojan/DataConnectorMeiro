@@ -17,7 +17,7 @@ def test_parse_line():
 
 
 def test_parse_file():
-    filepath = f"{Path(__file__).parent.resolve()}/resources/test_data.csv"
+    filepath = Path(__file__).parent / "resources" / "test_data.csv"
     with open(filepath, "rb") as f:
         buffer = parse_file(f, None, None)
     assert len(buffer) == 3

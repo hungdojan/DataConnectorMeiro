@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from datetime import date
+from pathlib import Path
 
 from data_connector.record import Record
 
@@ -48,6 +49,7 @@ def store_unsent_records(lof_records: list[Record]):
     The data are stored in a file at `FAILED_RECORDS_DIRPATH/unsent_{date}.csv`.
     """
     failed_records_dirpath = os.getenv("FAILED_RECORDS_DIRPATH", "/tmp")
-    with open(f"{failed_records_dirpath}/unsent_{date.today()}.csv", "a+") as f:
+    filepath = Path(f"{failed_records_dirpath}") / f"unsent_{date.today()}.csv"
+    with open(filepath, "a+") as f:
         for record in lof_records:
             f.write(f"{record.to_csv_string()}\n")

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pathlib import Path
 
 import click
 from flask.cli import with_appcontext
@@ -22,7 +23,7 @@ def upload_file(minimum: int | None, maximum: int | None, filename: str):
         exit(1)
 
     buffer = []
-    with open(filename, "rb") as f:
+    with open(Path(filename), "rb") as f:
         buffer = parse_file(f, minimum, maximum)
     nof_recs = send_data(buffer)
     click.echo(f"Successfully sent {nof_recs} of records.")

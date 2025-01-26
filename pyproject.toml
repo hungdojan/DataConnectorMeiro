@@ -4,9 +4,8 @@ version = "0.1.0"
 description = "A PoC data connector for Meiro"
 authors = ["Hung Do <hungdojan@gmail.com>"]
 readme = "README.md"
-packages = [
-    { include = "data-connector", from = "src" }
-]
+repository = "https://github.com/hungdojan/DataConnectorMeiro"
+packages = [{ include = "data_connector", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -31,9 +30,10 @@ env = [
     "API_URL=http://showadsapi.com",
     "PROJECT_KEY=project-key",
     "MIN_AGE=18",
-    "FAILED_RECORDS_DIRPATH=/tmp"
+    "FAILED_RECORDS_DIRPATH=/tmp",
 ]
 addopts = "-vs"
+pythonpath = ["src"]
 
 [tool.coverage.html]
 directory = "tests/reports/htmlcov"

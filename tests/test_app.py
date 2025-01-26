@@ -27,7 +27,7 @@ def test_send_record_api(client, mock_ok):
 
 
 def test_send_bulk_api(client, mock_ok):
-    filepath = f"{Path(__file__).parent.resolve()}/resources/test_data.csv"
+    filepath = Path(__file__).parent / "resources" / "test_data.csv"
     data = {"file": (open(filepath, "rb"), filepath)}
     with mock_ok:
         res = client.post("/send_record/bulk", data=data)
