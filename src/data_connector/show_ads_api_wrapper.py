@@ -43,9 +43,14 @@ def update_access_token(nof_tries: int = 3):
     def warning_msg(reason: str):
         logging.warning(f"Access Token request fail: {reason}")
 
+    logging.debug(
+        f"Sending a AccessToken request for project {OPT_DICT['project_key']}."
+    )
     res = requests.post(
         f"{OPT_DICT['base_url']}/auth", json={"ProjectKey": OPT_DICT["project_key"]}
     )
+
+    # trying `nof_tries` times
     tries = 0
     while res.status_code != 200 and (nof_tries == -1 or tries < nof_tries):
         if res.status_code == 400:
@@ -57,6 +62,9 @@ def update_access_token(nof_tries: int = 3):
         else:
             warning_msg(f"Request return code {res.status_code}.")
         tries += 1
+        res = requests.post(
+            f"{OPT_DICT['base_url']}/auth", json={"ProjectKey": OPT_DICT["project_key"]}
+        )
 
     if res.status_code != 200:
         logging.error("Access Token request fail: Unable to fetch auth token.")
@@ -129,6 +137,7 @@ def send_record(rec: Record) -> int:
             f"{OPT_DICT['base_url']}/banners/show", json=rec.transform_data()
         )
         if res.status_code == 200:
+            logging.debug(f"Successfully sent record {rec.cookie}.")
             rec_sent = 1
             retries = 0
         elif res.status_code == 401:

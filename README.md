@@ -69,6 +69,16 @@ docker run -p 5000:5000 \
     -v <dir-on-host>:/recover_dir \
     data-connector:latest
 ```
+
+Example or running the container:
+```bash
+docker run -p 5000:5000 \
+    -e API_URL="http://testapi.com" \
+    -e PROJECT_KEY="project-key" \
+    -e MIN_AGE="21" \
+    -v /tmp:/recover_dir \
+    data-connector:latest
+```
 ##### Running locally
 To run the app locally, you can use [Gunicorn](https://docs.gunicorn.org/en/latest/run.html#) or [Flask's CLI](https://flask.palletsprojects.com/en/stable/quickstart/#a-minimal-application).
 
@@ -132,7 +142,6 @@ Possible responses:
     202: { sent: <number-of-sent-records> },
     400: { message: <error-while-sending-file> },
     415: { message: <unsupported-file-type> }
-]
 ```
 
 Example of file upload using cURL command with the `MAX_AGE` filter:

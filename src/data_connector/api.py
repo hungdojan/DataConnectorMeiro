@@ -55,21 +55,25 @@ class SendRecord(Resource):
         envelope="message",
     )
     def post(self):
+        """POST endpoint for single record forwarding."""
         data = send_record_ns.payload
         try:
             rec = Record(
+                # select attributes relevant to the Record constructor
                 **{
                     k: v
                     for k, v in data.items()
                     if k in {"name", "age", "cookie", "banner_id"}
                 }
             )
+        # in case the Record cannot be constructed (missing field or something similar)
         except TypeError:
             log.error(
                 "/send_record: Failed to transform received data to Record object."
             )
             log.error(f"/send_record: {data}.")
             return {"message": "Failed to process data."}, HTTPStatus.BAD_REQUEST
+
         msg = f"Record {rec.cookie} did not pass the validation, ignored."
         if rec.validate(data.get("min_age"), data.get("max_age")):
             log.debug(f"/send_record: Sending {rec.cookie} to ShowAds API.")
@@ -101,6 +105,7 @@ class SendBulk(Resource):
         envelope="sent",
     )
     def post(self):
+        """POST endpoint for bulk record forwarding."""
         args = file_parser.parse_args()
         upload_file: FileStorage = args["file"]
         buffer: list[Record] = []
