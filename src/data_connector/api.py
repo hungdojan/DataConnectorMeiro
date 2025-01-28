@@ -76,7 +76,7 @@ class SendRecord(Resource):
 
         msg = f"Record {rec.cookie} did not pass the validation, ignored."
         if rec.validate(data.get("min_age"), data.get("max_age")):
-            log.debug(f"/send_record: Sending {rec.cookie} to ShowAds API.")
+            log.info(f"/send_record: Sending {rec.cookie} to ShowAds API.")
             send_record(rec)
             msg = f"Record {rec.cookie} sent to ShowAPI."
         return {"message": msg}, HTTPStatus.ACCEPTED

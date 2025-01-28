@@ -58,6 +58,7 @@ Before running the app, make sure to set the following environment variables:
 - `MIN_AGE` (optional) - Minimum age for filtering (default: 18).
 - `MAX_AGE` (optional) - Maximum age for filtering (default: no limit).
 - `FAILED_RECORDS_DIRPATH` (optional) - Directory for storing failed records (default: `/recover_dir` inside the container, `/tmp` on the host).
+- `LOGLEVEL` (optional) - Set the logging level. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL` (default: `WARNING`).
 
 ### Running the App
 ##### Using Docker
@@ -148,7 +149,6 @@ Example of file upload using cURL command with the `MAX_AGE` filter:
 ```sh
 curl -X 'POST' \
   'http://localhost:5000/send_record/bulk' \
-  -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@data.csv;type=text/csv' \
   -F 'max_age=30'

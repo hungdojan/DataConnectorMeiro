@@ -21,7 +21,7 @@ def parse_line(line: str) -> Record | None:
     # can throw an exception
     try:
         rec = Record(data[0], int(data[1]), data[2], int(data[3]))
-        logging.debug(f"Record {rec.cookie} loaded.")
+        logging.info(f"Record {rec.cookie} loaded.")
         return rec
     except (TypeError, ValueError):
         logging.warning(f"Error while parsing data: {data}")

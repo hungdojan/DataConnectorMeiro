@@ -43,7 +43,7 @@ def update_access_token(nof_tries: int = 3):
     def warning_msg(reason: str):
         logging.warning(f"Access Token request fail: {reason}")
 
-    logging.debug(
+    logging.info(
         f"Sending a AccessToken request for project {OPT_DICT['project_key']}."
     )
     res = requests.post(
@@ -69,7 +69,7 @@ def update_access_token(nof_tries: int = 3):
     if res.status_code != 200:
         logging.error("Access Token request fail: Unable to fetch auth token.")
         return
-    logging.debug("Access Token loaded")
+    logging.info("Access Token loaded")
     OPT_DICT["access_token"] = res.json()["AccessToken"]
 
 
@@ -93,7 +93,7 @@ def send_bulk(bulk_id: int, lof_records: list[Record]) -> int:
             json={"Data": [r.transform_data() for r in lof_records]},
         )
         if res.status_code == 200:
-            logging.debug(f"Send bulk {bulk_id}: A bulk successfully sent.")
+            logging.info(f"Send bulk {bulk_id}: A bulk successfully sent.")
             rec_sent = len(lof_records)
             retries = 0
         elif res.status_code == 401:
@@ -137,7 +137,7 @@ def send_record(rec: Record) -> int:
             f"{OPT_DICT['base_url']}/banners/show", json=rec.transform_data()
         )
         if res.status_code == 200:
-            logging.debug(f"Successfully sent record {rec.cookie}.")
+            logging.info(f"Successfully sent record {rec.cookie}.")
             rec_sent = 1
             retries = 0
         elif res.status_code == 401:
