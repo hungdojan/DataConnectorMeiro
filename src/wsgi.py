@@ -12,6 +12,7 @@ if level not in {'DEBUG', "INFO", "WARNING", "ERROR", "CRITICAL"}:
     level="WARNING"
 logging.basicConfig(level=level, format="[%(asctime)s] - %(levelname)s - %(message)s")
 
+# required environment varilables check
 if not os.getenv("API_URL"):
     logging.error("Environment variable API_URL not found.")
     exit(1)

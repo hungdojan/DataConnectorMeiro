@@ -55,8 +55,8 @@ Before running the app, make sure to set the following environment variables:
 
 - `API_URL` - The URL of the external API to send processed data to.
 - `PROJECT_KEY` - The project key value.
-- `MIN_AGE` (optional) - Minimum age for filtering (default: 18).
-- `MAX_AGE` (optional) - Maximum age for filtering (default: no limit).
+- `MIN_AGE` (optional) - Minimum age for filtering (default: 18). Numerical value is expected.
+- `MAX_AGE` (optional) - Maximum age for filtering (default: no limit). Numerical value is expected.
 - `FAILED_RECORDS_DIRPATH` (optional) - Directory for storing failed records (default: `/recover_dir` inside the container, `/tmp` on the host).
 - `LOGLEVEL` (optional) - Set the logging level. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL` (default: `WARNING`).
 
